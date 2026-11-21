@@ -53,6 +53,6 @@ describe('serving the web app', () => {
 
   it('still answers the API', async () => {
     const response = await app.inject({ url: '/api/health' });
-    expect(response.json()).toEqual({ status: 'ok' });
+    expect(response.json()).toEqual({ status: 'ok', db: 'not_configured' });
   });
 });

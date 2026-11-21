@@ -5,6 +5,9 @@ const envSchema = z.object({
   HOST: z.string().default('0.0.0.0'),
   PORT: z.coerce.number().int().positive().default(3000),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+  // Postgres connection string. Optional until the hosted database exists;
+  // without it /api/health reports db: "not_configured".
+  DATABASE_URL: z.url().optional(),
   // Absolute path of the built web app (apps/web/dist). Empty in development.
   WEB_DIST_DIR: z.string().min(1).optional(),
 });
