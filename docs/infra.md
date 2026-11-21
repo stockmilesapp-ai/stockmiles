@@ -3,6 +3,21 @@
 > ఈ file: stack, local setup, commands, folder layout. Stack లో ఏ మార్పు వచ్చినా ఇక్కడే update చేయాలి.
 > చివరి update: 2026-11-21
 
+## 0. స్థితి (2026-11-21)
+
+| విషయం                                                                      | స్థితి                                                                               |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Monorepo skeleton (api, web, shared)                                      | ✅ పూర్తి; `pnpm check`, 8 tests pass                                               |
+| PWA (manifest, service worker, offline shell, update banner)              | ✅ పూర్తి; desktop Chrome లో offline test pass                                       |
+| Docker image                                                              | ✅ local గా build, run test pass                                                   |
+| Render deploy (D0)                                                        | ✅ Live: https://stockmiles.onrender.com; Blueprint `in_sync`, push కి auto-deploy |
+| Phone test: iPhone 18 Pro Max, Safari (Add to Home Screen, airplane mode) | ✅ 2026-11-21 పూర్తి                                                                |
+| Phone test: Android Chrome (Install app, airplane mode)                   | ⏳ మిగిలి ఉంది                                                                        |
+| GitHub repo private చేయటం                                                  | ⏳ మిగిలి ఉంది (ఇప్పుడు public)                                                        |
+| Local Postgres (Docker)                                                   | ✅ నడుస్తోంది; API health check దాన్ని వాడుతుంది                                          |
+| Database layer                                                            | ✅ F1 health check (`db: ok/error/not_configured`); ⏳ F2 Drizzle + migrations    |
+| Hosted database                                                           | ✅ Supabase project సృష్టించబడింది (Singapore); ⏳ Render లో `DATABASE_URL` పెట్టాలి       |
+
 ## 1. Stack
 
 | పొర              | Tool                                 | Version        | ఎందుకు                                                |
@@ -122,16 +137,20 @@ stockmiles/
 
 ## 7. Deploy
 
+**Region నిర్ణయం (2026-11-21):** మొదటి ఎంపిక India (Mumbai). Supabase కి Mumbai ఉంది, కానీ Render కి India region లేదు. App, database ఒకే region లో ఉండాలి (లేకపోతే ప్రతి query కి అదనపు network delay), కాబట్టి రెండూ **Singapore**. Launch ముందు (DPDP, data India లో ఉండాలా అనేది) మళ్ళీ పరిశీలిస్తాం; Docker image, plain Postgres వల్ల provider మార్చటం సులభం.
+
 **ఆకారం:** ఒకే Docker image. Fastify `/api/*` తో పాటు web build (`apps/web/dist`) ని కూడా serve చేస్తుంది, కాబట్టి web, API ఒకే origin లో ఉంటాయి.
 
-| విషయం          | విలువ                                                                                   |
-| ------------- | -------------------------------------------------------------------------------------- |
-| Platform      | Render Web Service, `runtime: docker` (`render.yaml` Blueprint)                        |
-| Region / plan | Singapore (Render కి India region లేదు) / Free (idle అయితే నిద్రపోతుంది; demo ముందు ఒకసారి తెరవాలి) |
-| Deploy        | GitHub `main` కి push చేయగానే auto-deploy. Push Veera మాత్రమే చేస్తారు.                          |
-| Health check  | `/api/health`                                                                          |
-| Port          | Render `PORT` env ఇస్తుంది; `config.ts` దాన్నే చదువుతుంది                                    |
-| Database      | ఇంకా లేదు (F2 లో నిర్ణయం). Hosted database మీద migrations Veera మాత్రమే.                        |
+| విషయం          | విలువ                                                                                                                                                                                                                                                                                                              |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Live URL      | https://stockmiles.onrender.com (మొదటి deploy: 2026-11-21)                                                                                                                                                                                                                                                          |
+| Platform      | Render Web Service, `runtime: docker` (`render.yaml` Blueprint)                                                                                                                                                                                                                                                   |
+| Render IDs    | Workspace "My Workspace" `tea-dc0vu5hksfps73fcg380`; Blueprint `exs-dc10mt8u01pc738cspvg`; service `stockmiles` (`srv-dc10m96tlv9c73am6n1g`)                                                                                                                                                                      |
+| Region / plan | Singapore (Render కి India region లేదు) / Free (idle అయితే నిద్రపోతుంది; demo ముందు ఒకసారి తెరవాలి)                                                                                                                                                                                                                            |
+| Deploy        | GitHub `main` కి push చేయగానే auto-deploy. Push Veera మాత్రమే చేస్తారు.                                                                                                                                                                                                                                                     |
+| Health check  | `/api/health`                                                                                                                                                                                                                                                                                                     |
+| Port          | Render `PORT` env ఇస్తుంది; `config.ts` దాన్నే చదువుతుంది                                                                                                                                                                                                                                                               |
+| Database      | Supabase Postgres, project `stockmiles` (ref `tbpavlhncgnsoyfnmmlj`), org `stockmiles`, region `ap-southeast-1` (Singapore), free plan. Plain Postgres మాత్రమే (Supabase libraries, auth వాడము). Render కి Session pooler (IPv4) connection string, `DATABASE_URL` secret గా. Hosted database మీద migrations Veera మాత్రమే. |
 
 **Image లోపల:** Stage 1 web ని build చేస్తుంది. Stage 2 లో API production dependencies, `src/` files, `dist/` మాత్రమే ఉంటాయి; `node` user గా `node apps/api/src/server.ts` నడుస్తుంది. Tests, docs image లోకి వెళ్ళవు.
 
