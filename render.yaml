@@ -1,0 +1,13 @@
+# Render Blueprint: the service settings live in the repo, not only in the dashboard.
+services:
+  - type: web
+    name: stockmiles
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: singapore
+    plan: free
+    branch: main
+    healthCheckPath: /api/health
+    envVars:
+      - key: LOG_LEVEL
+        value: info
