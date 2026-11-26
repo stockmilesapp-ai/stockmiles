@@ -26,6 +26,12 @@ export function buildApp(config: Config) {
     await pool?.end();
   });
 
+  // Liveness: "the server process is up". Never touches the database, so the
+  // hosting platform's health check neither restarts the app during a database
+  // outage nor hammers the database with login attempts (Render checks every few seconds).
+  app.get('/api/health/live', async () => ({ status: 'ok' as const }));
+
+  // Full status for people and the web page, including the database.
   app.get('/api/health', async (request, reply): Promise<HealthResponse> => {
     if (!pool) return { status: 'ok', db: 'not_configured' };
     try {

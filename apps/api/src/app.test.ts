@@ -37,6 +37,24 @@ describe('GET /api/health', () => {
   });
 });
 
+describe('GET /api/health/live', () => {
+  it('answers ok without touching an unreachable database', async () => {
+    const app = buildApp(
+      loadConfig({
+        NODE_ENV: 'test',
+        DATABASE_URL: 'postgres://stockmiles:stockmiles@127.0.0.1:1/nothing',
+      }),
+    );
+    try {
+      const response = await app.inject({ method: 'GET', url: '/api/health/live' });
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toEqual({ status: 'ok' });
+    } finally {
+      await app.close();
+    }
+  });
+});
+
 describe('loadConfig', () => {
   it('uses defaults when nothing is set', () => {
     expect(loadConfig({})).toMatchObject({ PORT: 3000, NODE_ENV: 'development' });
