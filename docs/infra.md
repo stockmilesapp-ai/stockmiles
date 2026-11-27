@@ -1,22 +1,22 @@
 # StockMiles — Infra
 
 > ఈ file: stack, local setup, commands, folder layout. Stack లో ఏ మార్పు వచ్చినా ఇక్కడే update చేయాలి.
-> చివరి update: 2026-11-21
+> చివరి update: 2026-11-27
 
-## 0. స్థితి (2026-11-21)
+## 0. స్థితి (2026-11-27)
 
-| విషయం                                                                      | స్థితి                                                                               |
-| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Monorepo skeleton (api, web, shared)                                      | ✅ పూర్తి; `pnpm check`, 8 tests pass                                               |
-| PWA (manifest, service worker, offline shell, update banner)              | ✅ పూర్తి; desktop Chrome లో offline test pass                                       |
-| Docker image                                                              | ✅ local గా build, run test pass                                                   |
-| Render deploy (D0)                                                        | ✅ Live: https://stockmiles.onrender.com; ⏳ GitHub App connect అయ్యే వరకు push కి auto-deploy లేదు |
-| Phone test: iPhone 18 Pro Max, Safari (Add to Home Screen, airplane mode) | ✅ 2026-11-21 పూర్తి                                                                |
-| Phone test: Android Chrome (Install app, airplane mode)                   | ⏳ మిగిలి ఉంది                                                                        |
-| GitHub repo private చేయటం                                                  | ⏳ మిగిలి ఉంది (ఇప్పుడు public)                                                        |
-| Local Postgres (Docker)                                                   | ✅ నడుస్తోంది; API health check దాన్ని వాడుతుంది                                          |
-| Database layer                                                            | ✅ F1 health check (`db: ok/error/not_configured`); ⏳ F2 Drizzle + migrations    |
-| Hosted database                                                           | ✅ Supabase (Singapore) Render కి connect అయింది; live `/api/health` → `db: ok` (2026-11-26) |
+| విషయం                                                                      | స్థితి                                                                                                                            |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Monorepo skeleton (api, web, shared)                                      | ✅ పూర్తి; `pnpm check`, 12 tests pass                                                                                           |
+| PWA (manifest, service worker, offline shell, update banner)              | ✅ పూర్తి; desktop Chrome లో offline test pass                                                                                    |
+| Docker image                                                              | ✅ local గా build, run test pass                                                                                                |
+| Render deploy (D0)                                                        | ✅ Live: https://stockmiles.onrender.com; ✅ `main` కి push చేయగానే auto-deploy (2026-11-27 test: `480071e`, trigger `new_commit`) |
+| Phone test: iPhone 18 Pro Max, Safari (Add to Home Screen, airplane mode) | ✅ 2026-11-21 పూర్తి                                                                                                             |
+| Phone test: Android Chrome (Install app, airplane mode)                   | ⏳ మిగిలి ఉంది                                                                                                                     |
+| GitHub repo private చేయటం                                                  | ⏳ మిగిలి ఉంది (ఇప్పుడు public)                                                                                                     |
+| Local Postgres (Docker)                                                   | ✅ నడుస్తోంది; API health check దాన్ని వాడుతుంది                                                                                       |
+| Database layer                                                            | ✅ F1 health check (`db: ok/error/not_configured`); ⏳ F2 Drizzle + migrations                                                 |
+| Hosted database                                                           | ✅ Supabase (Singapore) Render కి connect అయింది; live `/api/health` → `db: ok` (2026-11-26)                                      |
 
 ## 1. Stack
 
@@ -59,17 +59,19 @@ pnpm db:up             # Docker Postgres: stockmiles_dev, stockmiles_test
 
 ## 3. రోజువారీ commands (root నుండి)
 
-| Command                                   | ఏమి చేస్తుంది                                                                 |
-| ----------------------------------------- | ------------------------------------------------------------------------- |
-| `pnpm dev`                                | API (http://localhost:3000) + web (http://localhost:5173) కలిసి, watch mode |
-| `pnpm test`                               | అన్ని Vitest tests                                                          |
-| `pnpm check`                              | Biome (lint + format check) + ప్రతి package లో `tsc`                         |
-| `pnpm format`                             | Biome తో format + imports సర్దుబాటు                                          |
-| `pnpm build`                              | Web production build (`apps/web/dist`) + `sw.js`, `manifest.webmanifest`  |
-| `pnpm --filter @stockmiles/web preview`   | Build ని http://localhost:4173 లో నడుపుతుంది; PWA ని test చేసే చోటు ఇదే           |
-| `pnpm --filter @stockmiles/web pwa:icons` | `public/logo-mark.svg` మారినప్పుడు మాత్రమే: icons మళ్ళీ తయారు                      |
-| `pnpm db:up` / `pnpm db:down`             | Local Postgres start / stop (data volume లో ఉంటుంది)                        |
-| `pnpm --filter @stockmiles/api <script>`  | ఒకే app లో script                                                           |
+| Command                                   | ఏమి చేస్తుంది                                                                                                  |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `pnpm dev`                                | API (http://localhost:3000) + web (http://localhost:5173) కలిసి, watch mode                                  |
+| `pnpm test`                               | అన్ని Vitest tests                                                                                           |
+| `pnpm check`                              | Biome (lint + format check) + ప్రతి package లో `tsc`                                                          |
+| `pnpm format`                             | Biome తో format + imports సర్దుబాటు                                                                           |
+| `pnpm build`                              | Web production build (`apps/web/dist`) + `sw.js`, `manifest.webmanifest`                                   |
+| `pnpm --filter @stockmiles/web preview`   | Build ని http://localhost:4173 లో నడుపుతుంది; PWA ని test చేసే చోటు ఇదే                                            |
+| `pnpm --filter @stockmiles/web pwa:icons` | `public/logo-mark.svg` మారినప్పుడు మాత్రమే: icons మళ్ళీ తయారు                                                       |
+| `pnpm db:up` / `pnpm db:down`             | Local Postgres start / stop (data volume లో ఉంటుంది)                                                         |
+| `pnpm db:generate`                        | `apps/api/src/db/schema/` నుంచి `apps/api/drizzle/*.sql` migration తయారు (DB ని తాకదు)                         |
+| `pnpm db:migrate`                         | `.env` లోని `DATABASE_URL` కి migrations apply. Local మాత్రమే; hosted కి `MIGRATE_ALLOW_HOST=<host>` (Veera మాత్రమే) |
+| `pnpm --filter @stockmiles/api <script>`  | ఒకే app లో script                                                                                            |
 
 ## 4. Ports, env
 
@@ -147,7 +149,7 @@ stockmiles/
 | Platform      | Render Web Service, `runtime: docker` (`render.yaml` Blueprint)                                                                                                                                                                                                                                                   |
 | Render IDs    | Workspace "My Workspace" `tea-dc0vu5hksfps73fcg380`; Blueprint `exs-dc10mt8u01pc738cspvg`; service `stockmiles` (`srv-dc10m96tlv9c73am6n1g`)                                                                                                                                                                      |
 | Region / plan | Singapore (Render కి India region లేదు) / Free (idle అయితే నిద్రపోతుంది; demo ముందు ఒకసారి తెరవాలి)                                                                                                                                                                                                                            |
-| Deploy        | GitHub `main` కి push చేయగానే auto-deploy. Push Veera మాత్రమే చేస్తారు.                                                                                                                                                                                                                                                     |
+| Deploy        | GitHub `main` కి push చేయగానే auto-deploy. దీనికి `stockmilesapp-ai` account లో **Render GitHub App install** అయి ఉండాలి (Settings → Applications → Installed GitHub Apps); login కోసం ఇచ్చే "Authorized" access సరిపోదు. Push Veera మాత్రమే చేస్తారు.                                                                                  |
 | Health check  | `/api/health/live` (database ని తాకదు). `/api/health` పూర్తి స్థితి (DB తో సహా) page కోసం. DB సమస్య వచ్చినా Render app ని restart చేయదు, DB ని login ప్రయత్నాలతో కొట్టదు.                                                                                                                                                                |
 | Port          | Render `PORT` env ఇస్తుంది; `config.ts` దాన్నే చదువుతుంది                                                                                                                                                                                                                                                               |
 | Database      | Supabase Postgres, project `stockmiles` (ref `tbpavlhncgnsoyfnmmlj`), org `stockmiles`, region `ap-southeast-1` (Singapore), free plan. Plain Postgres మాత్రమే (Supabase libraries, auth వాడము). Render కి Session pooler (IPv4) connection string, `DATABASE_URL` secret గా. Hosted database మీద migrations Veera మాత్రమే. |
