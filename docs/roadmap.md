@@ -7,16 +7,16 @@
 
 ప్రతి module = backend + frontend కలిపి ఒక vertical slice; ప్రతి task card లో acceptance, out of scope, offline ప్రవర్తన.
 
-| Module | ఏమి                                                                                                                                   | Demo                                 | స్థితి                     |
-| ------ | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ | ----------------------- |
-| F0–F1  | Monorepo, PWA, Render deploy, database connection, health                                                                            | Live site, phone install             | ✅                      |
-| F2     | Migrations (Drizzle) + `users` table                                                                                                 | `\d users`                           | ✅ local (Supabase ఇంకా) |
-| F4     | Google login, `sessions`, `GET /api/me`, logout; web: login page, avatar                                                             | Phone లో Google login, పేరు, photo     |                         |
-| F5     | `tenants`, `memberships`: platform staff tenant + మొదటి store సృష్టించి owner ని invite; `users.status` pending → active; tenant isolation | ⭐ Demo 0: owner login అయి తన shop లోకి |                         |
-| F6     | Store layout: floors, sections, fixtures (rack, T-stand), shelves, hangers, "Unplaced", codes                                        | Showroom అమరిక app లో                  |                         |
-| F7     | Warehouses (tenant + store attach), bins (ఐచ్ఛికం)                                                                                     | Godown, store room                   |                         |
-| F8     | Team: invite, roles, `membership_scopes`, permissions map, route checks                                                              | Cashier కి reports కనిపించవు            |                         |
-| తర్వాత   | Products, purchase trips, stock movements, transfers, billing (offline)                                                              |                                      |                         |
+| Module | ఏమి                                                                                                                                   | Demo                                 | స్థితి                                            |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ | ---------------------------------------------- |
+| F0–F1  | Monorepo, PWA, Render deploy, database connection, health                                                                            | Live site, phone install             | ✅                                             |
+| F2     | Migrations (Drizzle) + `users` table (`pending` / `active` / `suspended`)                                                            | `\d users`                           | ✅ local, commit `39e77e2` (Supabase F4 ముందు) |
+| F4     | Google login, `sessions`, `GET /api/me`, logout; web: login page, avatar                                                             | Phone లో Google login, పేరు, photo     |                                                |
+| F5     | `tenants`, `memberships`: platform staff tenant + మొదటి store సృష్టించి owner ని invite; `users.status` pending → active; tenant isolation | ⭐ Demo 0: owner login అయి తన shop లోకి |                                                |
+| F6     | Store layout: floors, sections, fixtures (rack, T-stand), shelves, hangers, "Unplaced", codes                                        | Showroom అమరిక app లో                  |                                                |
+| F7     | Warehouses (tenant + store attach), bins (ఐచ్ఛికం)                                                                                     | Godown, store room                   |                                                |
+| F8     | Team: invite, roles, `membership_scopes`, permissions map, route checks                                                              | Cashier కి reports కనిపించవు            |                                                |
+| తర్వాత   | Products, purchase trips, stock movements, transfers, billing (offline)                                                              |                                      |                                                |
 
 ## Veera నిర్ణయాలు (2026-11-27)
 

@@ -5,18 +5,18 @@
 
 ## 0. స్థితి (2026-11-27)
 
-| విషయం                                                                      | స్థితి                                                                                                                            |
-| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Monorepo skeleton (api, web, shared)                                      | ✅ పూర్తి; `pnpm check`, 12 tests pass                                                                                           |
-| PWA (manifest, service worker, offline shell, update banner)              | ✅ పూర్తి; desktop Chrome లో offline test pass                                                                                    |
-| Docker image                                                              | ✅ local గా build, run test pass                                                                                                |
-| Render deploy (D0)                                                        | ✅ Live: https://stockmiles.onrender.com; ✅ `main` కి push చేయగానే auto-deploy (2026-11-27 test: `480071e`, trigger `new_commit`) |
-| Phone test: iPhone 18 Pro Max, Safari (Add to Home Screen, airplane mode) | ✅ 2026-11-21 పూర్తి                                                                                                             |
-| Phone test: Android Chrome (Install app, airplane mode)                   | ⏳ మిగిలి ఉంది                                                                                                                     |
-| GitHub repo private చేయటం                                                  | ⏳ మిగిలి ఉంది (ఇప్పుడు public)                                                                                                     |
-| Local Postgres (Docker)                                                   | ✅ నడుస్తోంది; API health check దాన్ని వాడుతుంది                                                                                       |
-| Database layer                                                            | ✅ F1 health check (`db: ok/error/not_configured`); ⏳ F2 Drizzle + migrations                                                 |
-| Hosted database                                                           | ✅ Supabase (Singapore) Render కి connect అయింది; live `/api/health` → `db: ok` (2026-11-26)                                      |
+| విషయం                                                                      | స్థితి                                                                                                                                                                      |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Monorepo skeleton (api, web, shared)                                      | ✅ పూర్తి; `pnpm check`, 16 tests pass                                                                                                                                     |
+| PWA (manifest, service worker, offline shell, update banner)              | ✅ పూర్తి; desktop Chrome లో offline test pass                                                                                                                              |
+| Docker image                                                              | ✅ local గా build, run test pass                                                                                                                                          |
+| Render deploy (D0)                                                        | ✅ Live: https://stockmiles.onrender.com; ✅ `main` కి push చేయగానే auto-deploy (2026-11-27 test: `480071e`, trigger `new_commit`)                                           |
+| Phone test: iPhone 18 Pro Max, Safari (Add to Home Screen, airplane mode) | ✅ 2026-11-21 పూర్తి                                                                                                                                                       |
+| Phone test: Android Chrome (Install app, airplane mode)                   | ⏳ మిగిలి ఉంది                                                                                                                                                               |
+| GitHub repo private చేయటం                                                  | ⏳ మిగిలి ఉంది (ఇప్పుడు public)                                                                                                                                               |
+| Local Postgres (Docker)                                                   | ✅ నడుస్తోంది; API health check దాన్ని వాడుతుంది                                                                                                                                 |
+| Database layer                                                            | ✅ F1 health check; ✅ F2 Drizzle migrations + local-only guard + `users` table (local dev, test DBs; commit `39e77e2`); ⏳ Supabase కి `users` migrate (Veera, F4 ముందు) |
+| Hosted database                                                           | ✅ Supabase (Singapore) Render కి connect అయింది; live `/api/health` → `db: ok` (2026-11-26)                                                                                |
 
 ## 1. Stack
 
@@ -37,10 +37,14 @@
 |                 | @vite-pwa/assets-generator           | 2.0.0          | `logo-mark.svg` (పాత project నుండి) నుండి app icons      |
 | **API**         | Fastify                              | 5.12.8         | Long-running server                                   |
 |                 | pino-pretty (dev)                    | 13.2.0         | Dev లో చదవగలిగే logs                                     |
+|                 | @fastify/static                      | 10.1.12        | Production లో web build serve (§7)                     |
+|                 | pg, @types/pg                        | 8.23.1         | Postgres driver (`src/db/client.ts` Pool)             |
+|                 | Drizzle ORM                          | 0.45.4         | Schema (TypeScript), queries, migrator                |
+|                 | drizzle-kit (dev)                    | 0.31.11        | Schema నుంచి `.sql` migrations generate (DB ని తాకదు)    |
 | **Shared**      | Zod                                  | 4.6.7          | Web, API ఒకే schemas (`@stockmiles/shared`)            |
 | Database        | PostgreSQL (Docker)                  | 17             | Local dev + test మాత్రమే                                 |
 
-తర్వాత వచ్చేవి (వాడే module లోనే install చేస్తాం): Drizzle ORM + drizzle-kit + pg (F2), @fastify/cookie (F4), @fastify/static (deploy), uuid, decimal.js.
+తర్వాత వచ్చేవి (వాడే module లోనే install చేస్తాం): @fastify/cookie (F4), uuid (UUIDv7), decimal.js.
 
 **API కి build step లేదు.** Node 24 `.ts` files ని నేరుగా నడుపుతుంది (type stripping). అందుకే:
 
@@ -94,7 +98,7 @@ stockmiles/
   docker-compose.yml  docker/postgres/init.sql   # local DB మాత్రమే
   Dockerfile  .dockerignore  render.yaml          # deploy image + Render Blueprint
   .env.example
-  docs/infra.md
+  docs/infra.md  docs/roadmap.md  docs/domain/   # stack; modules; tenant model, access
   apps/
     api/            # @stockmiles/api — Fastify
       src/
@@ -102,7 +106,14 @@ stockmiles/
         app.ts      # buildApp(): routes; tests దీన్నే వాడతాయి
         server.ts   # listen + graceful shutdown (SIGTERM)
         web.ts      # WEB_DIST_DIR ఉంటే web build ని serve చేస్తుంది + SPA fallback
+        db/
+          client.ts   # createPool(): database కి ఏకైక దారి
+          migrate.ts  # runMigrations() + local-only guard (pnpm db:migrate)
+          schema/     # ఒక table కి ఒక file (users.ts ...)
+        test/global-setup.ts  # tests ముందు test DB migrate
         *.test.ts   # tests file పక్కనే
+      drizzle/      # generated .sql migrations + meta/ (చేతితో మార్చకూడదు; commit చేయాలి)
+      drizzle.config.ts
     web/            # @stockmiles/web — Vite + React
       index.html  vite.config.ts  pwa-assets.config.ts
       public/       # logo-mark.svg + తయారైన icons (favicon, pwa-*.png, apple-touch-icon)
