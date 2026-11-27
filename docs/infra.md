@@ -10,13 +10,13 @@
 | Monorepo skeleton (api, web, shared)                                      | ✅ పూర్తి; `pnpm check`, 8 tests pass                                               |
 | PWA (manifest, service worker, offline shell, update banner)              | ✅ పూర్తి; desktop Chrome లో offline test pass                                       |
 | Docker image                                                              | ✅ local గా build, run test pass                                                   |
-| Render deploy (D0)                                                        | ✅ Live: https://stockmiles.onrender.com; Blueprint `in_sync`, push కి auto-deploy |
+| Render deploy (D0)                                                        | ✅ Live: https://stockmiles.onrender.com; ⏳ GitHub App connect అయ్యే వరకు push కి auto-deploy లేదు |
 | Phone test: iPhone 18 Pro Max, Safari (Add to Home Screen, airplane mode) | ✅ 2026-11-21 పూర్తి                                                                |
 | Phone test: Android Chrome (Install app, airplane mode)                   | ⏳ మిగిలి ఉంది                                                                        |
 | GitHub repo private చేయటం                                                  | ⏳ మిగిలి ఉంది (ఇప్పుడు public)                                                        |
 | Local Postgres (Docker)                                                   | ✅ నడుస్తోంది; API health check దాన్ని వాడుతుంది                                          |
 | Database layer                                                            | ✅ F1 health check (`db: ok/error/not_configured`); ⏳ F2 Drizzle + migrations    |
-| Hosted database                                                           | ✅ Supabase project సృష్టించబడింది (Singapore); ⏳ Render లో `DATABASE_URL` పెట్టాలి       |
+| Hosted database                                                           | ✅ Supabase (Singapore) Render కి connect అయింది; live `/api/health` → `db: ok` (2026-11-26) |
 
 ## 1. Stack
 
